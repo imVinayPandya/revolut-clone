@@ -29,7 +29,7 @@ export const defaultStyles = StyleSheet.create({
     color: Colors.gray,
   },
   buttonText: {
-    color: "#fff",
+    color: Colors.white,
     fontSize: 18,
     fontWeight: "500",
   },
@@ -41,7 +41,7 @@ export const defaultStyles = StyleSheet.create({
     alignItems: "center",
   },
   buttonTextSmall: {
-    color: "#fff",
+    color: Colors.white,
     fontSize: 16,
     fontWeight: "500",
   },
@@ -54,7 +54,7 @@ export const defaultStyles = StyleSheet.create({
   block: {
     marginHorizontal: 20,
     padding: 14,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.white,
     borderRadius: 16,
     gap: 20,
   },

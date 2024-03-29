@@ -37,7 +37,9 @@ const Page = () => {
           asChild
         >
           <TouchableOpacity>
-            <Text style={{ color: "#fff", fontSize: 22, fontWeight: "500" }}>
+            <Text
+              style={{ color: Colors.white, fontSize: 22, fontWeight: "500" }}
+            >
               Log in
             </Text>
           </TouchableOpacity>
@@ -47,7 +49,7 @@ const Page = () => {
           href={"/signup"}
           style={[
             defaultStyles.pillButton,
-            { flex: 1, backgroundColor: "#fff" },
+            { flex: 1, backgroundColor: Colors.white },
           ]}
           asChild
         >
