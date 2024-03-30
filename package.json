@@ -33,10 +33,13 @@
     "react-native": "0.73.6",
     "react-native-confirmation-code-field": "^7.4.0",
     "react-native-gesture-handler": "~2.14.0",
+    "react-native-ios-context-menu": "^2.5.1",
+    "react-native-ios-utilities": "^4.4.4",
     "react-native-reanimated": "~3.6.2",
     "react-native-safe-area-context": "4.8.2",
     "react-native-screens": "~3.29.0",
-    "react-native-web": "~0.19.6"
+    "react-native-web": "~0.19.6",
+    "zeego": "^1.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
