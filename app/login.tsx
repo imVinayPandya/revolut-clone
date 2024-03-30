@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import {
   View,
   Text,
@@ -9,10 +9,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacityBase,
+  Alert,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { defaultStyles } from "@/constants/Styles";
 import { Ionicons } from "@expo/vector-icons";
+import { isClerkAPIResponseError, useSignIn } from "@clerk/clerk-expo";
 
 enum SignInType {
   Phone,
@@ -26,11 +28,40 @@ export default function Signup() {
   const [countryCode, setCountryCode] = useState("+49");
   const [mobileNumber, setMobileNumber] = useState("");
 
+  // hooks
+  const router = useRouter();
+  const { signIn } = useSignIn();
+
   // variables
   const keyboardVerticalOffset = Platform.OS === "ios" ? 70 : 0;
-  const handleLogin = (type: SignInType) => {
+  const handleLogin = async (type: SignInType) => {
     if (type === SignInType.Phone) {
-      console.log("Phone");
+      try {
+        const fullPhoneNumber = `${countryCode}${mobileNumber}`;
+        const { supportedFirstFactors } = await signIn!.create({
+          identifier: fullPhoneNumber,
+        });
+        const firstFactor: any = supportedFirstFactors.find(
+          (factor) => factor.strategy === "phone_code"
+        );
+        const { phoneNumberId } = firstFactor;
+        await signIn!.prepareFirstFactor({
+          strategy: "phone_code",
+          phoneNumberId,
+        });
+
+        router.push({
+          pathname: "/verify/[phone]",
+          params: { phone: fullPhoneNumber, signIn: "true" },
+        });
+      } catch (error) {
+        console.log("error", JSON.stringify(error, null, 2));
+        if (isClerkAPIResponseError(error)) {
+          if (error.errors[0].code === "form_identifier_not_found") {
+            Alert.alert("Error", error.errors[0].message);
+          }
+        }
+      }
     }
   };
 
