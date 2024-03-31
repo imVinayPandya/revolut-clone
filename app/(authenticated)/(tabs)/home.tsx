@@ -7,6 +7,7 @@ import Colors from "@/constants/Colors";
 import { useBalanceStore } from "@/store/balanceStore";
 import { defaultStyles } from "@/constants/Styles";
 import { Ionicons } from "@expo/vector-icons";
+import WidgetList from "@/components/SortableList/WidgetList";
 
 const Page = () => {
   // hooks
@@ -27,7 +28,10 @@ const Page = () => {
   };
 
   return (
-    <ScrollView style={{ backgroundColor: Colors.background }}>
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      style={{ backgroundColor: Colors.background }}
+    >
       <View style={styles.account}>
         <View style={styles.row}>
           <Text style={styles.balance}>{balance()}</Text>
@@ -59,7 +63,8 @@ const Page = () => {
           </Text>
         )}
 
-        {transactions.map((transaction) => (
+        {/* Show only recent 5 transactions */}
+        {transactions.slice(0, 5).map((transaction) => (
           <View
             key={transaction.id}
             style={{
@@ -90,12 +95,12 @@ const Page = () => {
                 {transaction.title}
               </Text>
               <Text style={{ color: Colors.gray, fontSize: 12 }}>
-                {transaction?.date?.toLocaleDateString(undefined, {
+                {new Date(transaction.date).toLocaleDateString(undefined, {
                   year: "numeric",
                   month: "short",
                   day: "2-digit",
                 })}{" "}
-                {transaction.date.toLocaleTimeString(undefined, {
+                {new Date(transaction.date).toLocaleTimeString(undefined, {
                   hour12: false,
                   hour: "2-digit",
                   minute: "2-digit",
@@ -107,6 +112,8 @@ const Page = () => {
           </View>
         ))}
       </View>
+      <Text style={defaultStyles.sectionHeader}>Widgets</Text>
+      <WidgetList />
     </ScrollView>
   );
 };
