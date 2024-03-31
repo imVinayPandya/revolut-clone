@@ -52,7 +52,7 @@ export default function Signup() {
 
         router.push({
           pathname: "/verify/[phone]",
-          params: { phone: fullPhoneNumber, signIn: "true" },
+          params: { phone: fullPhoneNumber, signin: "true" },
         });
       } catch (error) {
         console.log("error", JSON.stringify(error, null, 2));

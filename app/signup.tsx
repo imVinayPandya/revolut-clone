@@ -39,7 +39,7 @@ export default function Signup() {
         params: { phone: fullPhoneNumber },
       });
     } catch (error) {
-      console.log(error);
+      console.log("error", JSON.stringify(error, null, 2));
       Alert.alert("Error", "Something went wrong. Please try again.");
     }
   };
