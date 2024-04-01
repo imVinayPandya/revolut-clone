@@ -1,14 +1,37 @@
-import Colors from "@/constants/Colors";
+import React from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import React from "react";
-import { View, Text } from "react-native";
+import { BlurView } from "expo-blur";
+
+import Colors from "@/constants/Colors";
+import CustomHeader from "@/components/CustomHeader";
 
 const Layout = () => {
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors.primary,
+        tabBarBackground() {
+          return (
+            <BlurView
+              intensity={100}
+              tint="extraLight"
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(0, 0, 0, 0.05)",
+              }}
+            />
+          );
+        },
+        tabBarStyle: {
+          backgroundColor: "transparent",
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          borderTopWidth: 0,
+          elevation: 0,
+        },
       }}
     >
       <Tabs.Screen
@@ -18,6 +41,8 @@ const Layout = () => {
           tabBarIcon: ({ size, color }) => (
             <FontAwesome name="registered" size={size} color={color} />
           ),
+          header: () => <CustomHeader />,
+          headerTransparent: true,
         }}
       />
 

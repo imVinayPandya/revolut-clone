@@ -9,7 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 const styles = StyleSheet.create({
   container: {
     width: SIZE - 20,
-    height: 150,
+    height: 160,
     backgroundColor: Colors.white,
     borderRadius: 20,
     shadowColor: Colors.dark,

@@ -1,18 +1,20 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useHeaderHeight } from "@react-navigation/elements";
 
 import Dropdown from "@/components/Dropdown";
 import RoundButton from "@/components/RoundButton";
 import Colors from "@/constants/Colors";
 import { useBalanceStore } from "@/store/balanceStore";
 import { defaultStyles } from "@/constants/Styles";
-import { Ionicons } from "@expo/vector-icons";
 import WidgetList from "@/components/SortableList/WidgetList";
 
 const Page = () => {
   // hooks
   const { balance, clearTransactions, runTransaction, transactions } =
     useBalanceStore();
+  const headerHeight = useHeaderHeight();
 
   const handleAddOnPress = () => {
     const amount =
@@ -31,6 +33,9 @@ const Page = () => {
     <ScrollView
       showsVerticalScrollIndicator={false}
       style={{ backgroundColor: Colors.background }}
+      contentContainerStyle={{
+        paddingTop: headerHeight,
+      }}
     >
       <View style={styles.account}>
         <View style={styles.row}>
