@@ -1,20 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   ScrollView,
   SectionList,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useQuery } from "@tanstack/react-query";
+import { Ionicons } from "@expo/vector-icons";
+import { CartesianChart, Line, useChartPressState } from "victory-native";
+import { Circle, useFont } from "@shopify/react-native-skia";
+import * as Haptics from "expo-haptics";
+import Animated, {
+  SharedValue,
+  useAnimatedProps,
+} from "react-native-reanimated";
 
 import { defaultStyles } from "@/constants/Styles";
 import Colors from "@/constants/Colors";
-import { Ionicons } from "@expo/vector-icons";
 
 const categories = [
   "Overview",
@@ -26,6 +34,14 @@ const categories = [
   "More",
 ];
 
+const INIT_STATE = { x: 0, y: { price: 0 } } as const;
+
+function ToolTip({ x, y }: { x: SharedValue<number>; y: SharedValue<number> }) {
+  return <Circle cx={x} cy={y} r={8} color={Colors.primary} />;
+}
+Animated.addWhitelistedNativeProps({ text: true });
+const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
+
 const CryptoDetails = () => {
   // state
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
@@ -33,6 +49,12 @@ const CryptoDetails = () => {
   // hooks
   const { id } = useLocalSearchParams();
   const headerHeight = useHeaderHeight();
+  const font = useFont(require("@/assets/fonts/SpaceMono-Regular.ttf"), 12);
+  const { state, isActive } = useChartPressState(INIT_STATE);
+
+  useEffect(() => {
+    if (isActive) Haptics.selectionAsync();
+  }, [isActive]);
 
   const { data } = useQuery({
     queryKey: ["info", id],
@@ -41,7 +63,29 @@ const CryptoDetails = () => {
       return info[+id];
     },
   });
-  if (!data) return null;
+
+  const { data: tickers } = useQuery({
+    queryKey: ["tickers"],
+    queryFn: async (): Promise<any[]> =>
+      fetch(`/api/tickers`).then((res) => res.json()),
+  });
+
+  const animatedText = useAnimatedProps(() => {
+    return {
+      text: `${state.y.price.value.value.toFixed(2)} €`,
+      defaultValue: "",
+    };
+  });
+
+  const animatedDateText = useAnimatedProps(() => {
+    const date = new Date(state.x.value.value);
+    return {
+      text: `${date.toLocaleDateString()}`,
+      defaultValue: "",
+    };
+  });
+
+  if (!data || !tickers) return null;
 
   return (
     <>
@@ -123,6 +167,7 @@ const CryptoDetails = () => {
                       gap: 16,
                     },
                   ]}
+                  onPress={() => Haptics.impactAsync()}
                 >
                   <Ionicons name="add" size={24} color={"#fff"} />
                   <Text style={[defaultStyles.buttonText, { color: "#fff" }]}>
@@ -138,6 +183,7 @@ const CryptoDetails = () => {
                       gap: 16,
                     },
                   ]}
+                  onPress={() => Haptics.selectionAsync()}
                 >
                   <Ionicons
                     name="arrow-back"
@@ -160,8 +206,77 @@ const CryptoDetails = () => {
         renderItem={({ item }) => {
           return (
             <>
-              {/*TODO: Add chart */}
-              <View style={{ height: 500, backgroundColor: "yellow" }}></View>
+              <View style={[defaultStyles.block, { height: 500 }]}>
+                {!isActive && (
+                  <View>
+                    <Text
+                      style={{
+                        fontSize: 30,
+                        fontWeight: "bold",
+                        color: Colors.dark,
+                      }}
+                    >
+                      {tickers[tickers.length - 1].price.toFixed(2)} €
+                    </Text>
+                    <Text style={{ fontSize: 18, color: Colors.gray }}>
+                      Today
+                    </Text>
+                  </View>
+                )}
+                {isActive && (
+                  <View>
+                    <AnimatedTextInput
+                      editable={false}
+                      underlineColorAndroid={"transparent"}
+                      style={{
+                        fontSize: 30,
+                        fontWeight: "bold",
+                        color: Colors.dark,
+                      }}
+                      animatedProps={animatedText}
+                    ></AnimatedTextInput>
+                    <AnimatedTextInput
+                      editable={false}
+                      underlineColorAndroid={"transparent"}
+                      style={{ fontSize: 18, color: Colors.gray }}
+                      animatedProps={animatedDateText}
+                    ></AnimatedTextInput>
+                  </View>
+                )}
+                <CartesianChart
+                  data={tickers}
+                  chartPressState={state}
+                  axisOptions={{
+                    font,
+                    tickCount: 5,
+                    labelOffset: { x: -2, y: 0 },
+                    labelColor: Colors.gray,
+                    formatYLabel: (value) => `${value} €`,
+                    formatXLabel: (label) => {
+                      const date = new Date(label);
+                      return `${date.getMonth() + 1}/${date.getFullYear()}`;
+                    },
+                  }}
+                  xKey="timestamp"
+                  yKeys={["price"]}
+                >
+                  {({ points }) => (
+                    <>
+                      <Line
+                        points={points.price}
+                        color={Colors.primary}
+                        strokeWidth={3}
+                      />
+                      {isActive && (
+                        <ToolTip
+                          x={state.x.position}
+                          y={state.y.price.position}
+                        />
+                      )}
+                    </>
+                  )}
+                </CartesianChart>
+              </View>
               <View style={[defaultStyles.block, { marginTop: 20 }]}>
                 <Text style={styles.subtitle}>Overview</Text>
                 <Text style={{ color: Colors.gray }}>

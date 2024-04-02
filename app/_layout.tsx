@@ -2,10 +2,16 @@ import { useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
-import { Link, Stack, useRouter, useSegments } from "expo-router";
+import {
+  Link,
+  Stack,
+  useRouter,
+  useSegments,
+  useRootNavigationState,
+} from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Platform, Text, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 export {
   // Catch any errors thrown by the Layout component.
@@ -14,11 +20,8 @@ export {
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import * as SecureStore from "expo-secure-store";
 import { TokenCache } from "@clerk/clerk-expo/dist/cache";
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 
 import Colors from "@/constants/Colors";
 
@@ -47,12 +50,13 @@ SplashScreen.preventAutoHideAsync();
 const InitialLayout = () => {
   // hooks
   const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    SpaceMono: require("@/assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
   const router = useRouter();
   const { isLoaded, isSignedIn } = useAuth();
   const segments = useSegments();
+  const navigationState = useRootNavigationState();
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -66,15 +70,16 @@ const InitialLayout = () => {
   }, [loaded]);
 
   useEffect(() => {
-    if (!isLoaded) return;
+    if (!navigationState?.key || !isLoaded) return;
 
-    const isAuthGroup = segments[0] === "(authenticated)";
+    const isAuthGroup = segments.length && segments[0] === "(authenticated)";
+
     if (isSignedIn && !isAuthGroup) {
-      router.replace("/(authenticated)/(tabs)/home");
+      return router.replace("/(authenticated)/(tabs)/home");
     } else if (!isSignedIn) {
-      router.replace("/");
+      return router.replace("/");
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, segments, isLoaded, navigationState]);
 
   if (!loaded || !isLoaded) {
     return <Text>Loading...</Text>;
@@ -156,7 +161,7 @@ const InitialLayout = () => {
           headerTransparent: true,
           headerRight: () => (
             <View style={{ flexDirection: "row", gap: 10 }}>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => Haptics.notificationAsync()}>
                 <Ionicons
                   name="notifications-outline"
                   color={Colors.dark}
