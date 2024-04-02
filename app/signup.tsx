@@ -33,7 +33,6 @@ export default function Signup() {
         phoneNumber: fullPhoneNumber,
       });
       signUp!.preparePhoneNumberVerification();
-      console.log("signup started");
       router.push({
         pathname: "/verify/[phone]",
         params: { phone: fullPhoneNumber },

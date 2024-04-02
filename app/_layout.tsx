@@ -5,7 +5,7 @@ import { useFonts } from "expo-font";
 import { Link, Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { Text, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 export {
   // Catch any errors thrown by the Layout component.
@@ -69,8 +69,6 @@ const InitialLayout = () => {
     if (!isLoaded) return;
 
     const isAuthGroup = segments[0] === "(authenticated)";
-    console.log("segments[0]", segments[0]);
-    console.log("isSignedIn", isSignedIn);
     if (isSignedIn && !isAuthGroup) {
       router.replace("/(authenticated)/(tabs)/home");
     } else if (!isSignedIn) {
@@ -149,6 +147,33 @@ const InitialLayout = () => {
       <Stack.Screen
         name="(authenticated)/(tabs)"
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="(authenticated)/crypto/[id]"
+        options={{
+          title: "",
+          headerLargeTitle: true,
+          headerTransparent: true,
+          headerRight: () => (
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <TouchableOpacity>
+                <Ionicons
+                  name="notifications-outline"
+                  color={Colors.dark}
+                  size={30}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Ionicons name="star-outline" color={Colors.dark} size={30} />
+              </TouchableOpacity>
+            </View>
+          ),
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color={Colors.dark} />
+            </TouchableOpacity>
+          ),
+        }}
       />
     </Stack>
   );

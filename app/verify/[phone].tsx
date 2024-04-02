@@ -66,7 +66,6 @@ const VerifyPhone = () => {
 
   useEffect(() => {
     if (code.length === 6) {
-      console.log({ code, signin });
       // verify code
       if (signin === "true") {
         verifySignIn();
