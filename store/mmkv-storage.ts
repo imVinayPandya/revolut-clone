@@ -17,3 +17,20 @@ export const zustandStorage: StateStorage = {
     return storage.delete(name);
   },
 };
+
+const inactivityStorageInstance = new MMKV({
+  id: "inactivity-storage",
+});
+
+export const inactivityStorage = {
+  recordInactivity: () => {
+    return inactivityStorageInstance.set("startTime", Date.now());
+  },
+  getInactivity: () => {
+    const value = inactivityStorageInstance.getNumber("startTime");
+    return value ?? 0;
+  },
+  removeInactivity: () => {
+    return inactivityStorageInstance.delete("startTime");
+  },
+};

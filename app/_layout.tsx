@@ -11,7 +11,13 @@ import {
 } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { Platform, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 export {
   // Catch any errors thrown by the Layout component.
@@ -24,6 +30,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 
 import Colors from "@/constants/Colors";
+import { UserInactivityProvider } from "@/context/UserInactivity";
 
 const queryClient = new QueryClient();
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -73,7 +80,6 @@ const InitialLayout = () => {
     if (!navigationState?.key || !isLoaded) return;
 
     const isAuthGroup = segments.length && segments[0] === "(authenticated)";
-
     if (isSignedIn && !isAuthGroup) {
       return router.replace("/(authenticated)/(tabs)/home");
     } else if (!isSignedIn) {
@@ -82,7 +88,17 @@ const InitialLayout = () => {
   }, [isSignedIn, segments, isLoaded, navigationState]);
 
   if (!loaded || !isLoaded) {
-    return <Text>Loading...</Text>;
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
   }
 
   return (
@@ -180,6 +196,11 @@ const InitialLayout = () => {
           ),
         }}
       />
+
+      <Stack.Screen
+        name="(authenticated)/(modals)/lock"
+        options={{ headerShown: false, animation: "none" }}
+      />
     </Stack>
   );
 };
@@ -191,10 +212,12 @@ const RootLayoutNav = () => {
       tokenCache={tokenCache}
     >
       <QueryClientProvider client={queryClient}>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <StatusBar style="light" />
-          <InitialLayout />
-        </GestureHandlerRootView>
+        <UserInactivityProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <StatusBar style="light" />
+            <InitialLayout />
+          </GestureHandlerRootView>
+        </UserInactivityProvider>
       </QueryClientProvider>
     </ClerkProvider>
   );
