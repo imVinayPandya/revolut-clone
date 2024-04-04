@@ -47,7 +47,8 @@
     "zeego": "^1.10.0",
     "zustand": "^4.5.2",
     "expo-haptics": "~12.8.1",
-    "expo-local-authentication": "~13.8.0"
+    "expo-local-authentication": "~13.8.0",
+    "expo-image-picker": "~14.7.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

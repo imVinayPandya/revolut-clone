@@ -10,6 +10,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
 
 const CustomHeader = () => {
   const { top } = useSafeAreaInsets();
@@ -17,17 +18,19 @@ const CustomHeader = () => {
     <BlurView intensity={80} tint="extraLight" style={{ paddingTop: top }}>
       <View style={[styles.container]}>
         {/* avatar */}
-        <TouchableOpacity style={styles.avatar}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "500",
-              color: Colors.white,
-            }}
-          >
-            VP
-          </Text>
-        </TouchableOpacity>
+        <Link href="/(authenticated)/(modals)/account" asChild>
+          <TouchableOpacity style={styles.avatar}>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "500",
+                color: Colors.white,
+              }}
+            >
+              VP
+            </Text>
+          </TouchableOpacity>
+        </Link>
         {/* search */}
         <View style={styles.searchBar}>
           <Ionicons
