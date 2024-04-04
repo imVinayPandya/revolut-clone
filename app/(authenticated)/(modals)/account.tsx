@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -13,6 +13,22 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import Colors from "@/constants/Colors";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { setAppIcon, getAppIcon } from "expo-dynamic-app-icon";
+
+const ICONS = [
+  {
+    name: "Default",
+    icon: require("@/assets/images/icon.png"),
+  },
+  {
+    name: "Dark",
+    icon: require("@/assets/images/icon-dark.png"),
+  },
+  {
+    name: "Vivid",
+    icon: require("@/assets/images/icon-vivid.png"),
+  },
+];
 
 const Account = () => {
   // hooks
@@ -25,6 +41,16 @@ const Account = () => {
   const [lastName, setLastName] = useState(user?.lastName || "");
   const [edit, setEdit] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [activeIcon, setActiveIcon] = useState("Default");
+
+  useEffect(() => {
+    const loadCurrentIconPref = async () => {
+      const icon = await getAppIcon();
+      console.log("🚀 ~ loadCurrentIconPref ~ icon:", icon);
+      setActiveIcon(icon);
+    };
+    loadCurrentIconPref();
+  }, []);
 
   const onSaveUser = async () => {
     try {
@@ -57,6 +83,11 @@ const Account = () => {
       file: base64,
     });
     setIsUploading(false);
+  };
+
+  const onChangeAppIcon = async (icon: string) => {
+    await setAppIcon(icon.toLowerCase());
+    setActiveIcon(icon);
   };
 
   return (
@@ -153,6 +184,22 @@ const Account = () => {
             <Text style={{ color: "#fff", fontSize: 12 }}>14</Text>
           </View>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.actions}>
+        {ICONS.map((icon) => (
+          <TouchableOpacity
+            key={icon.name}
+            style={styles.btn}
+            onPress={() => onChangeAppIcon(icon.name)}
+          >
+            <Image source={icon.icon} style={{ width: 24, height: 24 }} />
+            <Text style={{ color: "#fff", fontSize: 18 }}>{icon.name}</Text>
+            {activeIcon.toLowerCase() === icon.name.toLowerCase() && (
+              <Ionicons name="checkmark" size={24} color={"#fff"} />
+            )}
+          </TouchableOpacity>
+        ))}
       </View>
     </BlurView>
   );

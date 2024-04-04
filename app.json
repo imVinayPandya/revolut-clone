@@ -48,6 +48,23 @@
         {
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos"
         }
+      ],
+      [
+        "expo-dynamic-app-icon",
+        {
+          "default": {
+            "image": "./assets/images/icon.png",
+            "prerendered": true
+          },
+          "dark": {
+            "image": "./assets/images/icon-dark.png",
+            "prerendered": true
+          },
+          "vivid": {
+            "image": "./assets/images/icon-vivid.png",
+            "prerendered": true
+          }
+        }
       ]
     ],
     "experiments": {
